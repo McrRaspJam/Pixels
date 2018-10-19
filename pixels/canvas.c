@@ -1,3 +1,12 @@
+/* canvas.c -- The Canvas
+ *
+ * The Canvas is an SDL surface which is used as the "virtual image" for user
+ * progams. It is scaled up to fit the window.
+ *
+ * Draw functions create pixels on the Canvas, and Screen updates blit the
+ * surface to the window
+ */
+
 #include <stdio.h> 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -5,78 +14,35 @@
 
 #include "canvas.h"
 
-Canvas canvas;
-
-Canvas * canvas_get()
-{
-	return &canvas;
-}
+SDL_Surface * canvas;
 
 
-/* Return false if coordinate lies outside canvas */
-bool coordinate_validate(Coordinate *coordinate)
-{
-	bool valid = true;
-
-	if (coordinate->x < 0)
-		valid = false;
-	else if (coordinate->x >= canvas.size_x)
-		valid = false;
-	else if (coordinate->y < 0)
-		valid = false;
-	else if (coordinate->y >= canvas.size_y)
-		valid = false;
-
-	return valid;
-}
-
-
-/* Clip coordinate to canvas size */
-void coordinate_bound(Coordinate *coordinate)
-{
-	if (coordinate->x < 0)
-		coordinate->x = 0;
-	else if (coordinate->x >= canvas.size_x)
-		coordinate->x = canvas.size_x - 1;
-
-	if (coordinate->y < 0)
-		coordinate->y = 0;
-	else if (coordinate->y >= canvas.size_y)
-		coordinate->y = canvas.size_y - 1;
-}
-
-
-/* Return pointer to a canvas pixel */
-struct canvas_pixel * canvas_getpixel(Coordinate coordinate)
-{
-	coordinate_bound(&coordinate);
-	return canvas.pixels + ((coordinate.y * canvas.size_y) + coordinate.x);
-}
-
-/*
- * Allocate the canvas array to a given pixel value
- */
+/* Initialise and allocate the Canvas */
 void canvas_create(int width, int height)
 {
-	if (canvas.allocated == true) {
-		free(canvas.pixels);
-		canvas.allocated = false;
-	}
+	if (canvas != NULL)
+		canvas_cleanup();
 
-	struct canvas_pixel defaultpixel;
-	defaultpixel.r = 0x00;
-	defaultpixel.g = 0x00;
-	defaultpixel.b = 0x00;
+	canvas = SDL_CreateRGBSurface(0,
+			width,
+			height,
+			32,
+			0xff000000,
+			0x00ff0000,
+			0x0000ff00,
+			0x000000ff);
+}
 
-	canvas.size_x = width;
-	canvas.size_y = height;
-	
-	canvas.pixels = (struct canvas_pixel *) malloc((width * height) * sizeof(struct canvas_pixel));
-	canvas.allocated = true;
 
-	int i;
-	int j;
-	for (j = 0; j < height; j++)
-		for (i = 0; i < width; i++)
-			*(canvas.pixels + ((j * width) + i)) = defaultpixel;
+/* Variable accessor */
+SDL_Surface * canvas_get()
+{
+	return canvas;
+}
+
+
+/* Free the Canvas */
+void canvas_cleanup()
+{
+	SDL_FreeSurface(canvas);
 }

@@ -9,9 +9,10 @@
 #define MAX_SCALEFACTOR 64
 
 SDL_Window *window;
-SDL_Surface *surface;
+SDL_Surface *window_surface;
 SDL_Renderer *renderer;
-struct window_settings current_settings;
+int scalefactor;
+
 
 /* Returns next lowest power of two e.g. 53 -> 32 */
 int rounddown(int value)
@@ -25,55 +26,41 @@ int rounddown(int value)
 }
 
 
-/*
- * Calculates the largest scale factor
- * that will fit on-screen for a given canvas size.
- */
-int screen_calculatescalefactor (int width, int height)
+/* Calculates the largest scale factor that will fit on-screen. */
+int screen_calculatescalefactor(int width, int height)
 {
 	SDL_DisplayMode dm;
-
-	//SDL_Init(SDL_INIT_VIDEO);
 	
 	if (SDL_GetDesktopDisplayMode(0, &dm) != 0) {
 		SDL_Log("SDL_GetDesktopDisplayMode Failed");
 		return 1;
 	}
 	
+	/* Leave some space for window decorations */
 	dm.w = dm.w - 64;
-	dm.h = dm.h - 64;	
+	dm.h = dm.h - 64;
 
 	int scale_width = dm.w / width;
 	int scale_height = dm.h / height;
-	int scale_final;
 
-	if (scale_width < scale_height)
-		scale_final = scale_width;
-	else
+	int scale_final = scale_width;
+	if (scale_width > scale_height)
 		scale_final = scale_height;
-	
-	/*
-	if (scale_final > MAX_SCALEFACTOR)
-		scale_final = MAX_SCALEFACTOR;
-	printf("Scale Factor:\t%d\n", scale_final);
-	*/
 	
 	return rounddown(scale_final);
 }
 
 
-/* Calculate all the window settings */
-struct window_settings screen_getwindowsettings (int width, int height)
+/* Calculate the window settings */
+void screen_calcwindowsettings (int width, int height, int *win_width, int *win_height, int *scalefactor)
 {
-	struct window_settings ret;
-
-	ret.scalefactor = screen_calculatescalefactor(width, height);
-	ret.w = width * ret.scalefactor;
-	ret.h = height * ret.scalefactor;
-
-	return ret;
+	*scalefactor = screen_calculatescalefactor(width, height);
+	*win_width = width * *scalefactor;
+	*win_height = height * *scalefactor;
 }
 
+
+/* Checks SDL event for window closing */
 bool screen_closebuttonpressed()
 {
 	SDL_Event e;
@@ -85,67 +72,67 @@ bool screen_closebuttonpressed()
 	return false;
 }
 
+
 /* Setup an SDL window in the standard way */
-void screen_setup(int width, int height)
+int screen_setup(int width, int height)
 {
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
+	/* Initialise SDL */
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init fail : %s\n", SDL_GetError());
-		return;
+		return -1;
 	}
-	
-	current_settings = screen_getwindowsettings(width, height);
-	int w = current_settings.w;
-	int h = current_settings.h;
 
-	window = SDL_CreateWindow("Canvas", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
+	/* Create a window */
+	int window_width, window_height;
+	screen_calcwindowsettings(width, height, &window_width, &window_height, &scalefactor);
+
+	window = SDL_CreateWindow("Canvas", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, 0);
 	if (!window) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Window creation fail : %s\n",SDL_GetError());
-		return;
+		return -1;
 	}
 
-	surface = SDL_GetWindowSurface(window);
-	renderer = SDL_CreateSoftwareRenderer(surface);
+	/* Create the window surface and check the canvas exists */
+	window_surface = SDL_GetWindowSurface(window);
+	SDL_Surface * canvasget = canvas_get();
+	if (canvasget == NULL) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Canvas not created!");
+		return -1;
+	}
 
+	/* Create the software renderer for the canvas */
+	renderer = SDL_CreateSoftwareRenderer(canvas_get());
 	if (!renderer) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Render creation for surface fail : %s\n",SDL_GetError());
-		return;
+		return -1;
 	}
     
+	/* Clear the canvas */
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0xFF, 0xFF);
 	SDL_RenderClear(renderer);
 }
 
 
-/* Update renderer with canvas, upscaling on the way */
+/* Access function for canvas renderer */
+SDL_Renderer * screen_getrenderer()
+{
+	return renderer;
+}
+
+
+/* Blit the canvas and update window */
 void screen_update()
 {
-	Canvas *canvas = canvas_get();
-
-	SDL_Rect block;
-	block.w = current_settings.scalefactor;
-	block.h = current_settings.scalefactor;
-	
-	int p;
-	for (p = 0; p < (canvas->size_x * canvas->size_y); p++) {
-		int x = p % canvas->size_x;
-		int y = p / canvas->size_x;
-		block.x = x * current_settings.scalefactor;
-		block.y = y * current_settings.scalefactor;
-
-		struct canvas_pixel *pixel = canvas->pixels + p;
-		
-		SDL_SetRenderDrawColor(renderer, pixel->r, pixel->g, pixel->b, 0xFF);
-
-		SDL_RenderFillRect(renderer, &block);
-	}	
+	SDL_BlitScaled(canvas_get(), NULL, window_surface, NULL);
 	SDL_UpdateWindowSurface(window);
 }
 
 
-/* Window cleanup */
+/* Last function called by user, so do all cleanup now! */
 void screen_cleanup()
 {
+	canvas_cleanup();
 	SDL_Quit();
 }

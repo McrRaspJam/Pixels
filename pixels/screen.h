@@ -9,10 +9,11 @@ struct window_settings {
 };
 
 int rounddown(int value);
-int screen_calculatescalefactor (int width, int height);
-struct window_settings screen_getwindowsettings (int width, int height);
+int screen_calculatescalefactor(int width, int height);
+void screen_calcwindowsettings (int width, int height, int *win_width, int *win_height, int *scalefactor);
 bool screen_closebuttonpressed();
-void screen_setup(int width, int height);
+int screen_setup(int width, int height);
+SDL_Renderer * screen_getrenderer();
 void screen_update();
 void screen_cleanup();
 
