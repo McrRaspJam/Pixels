@@ -11,8 +11,8 @@
 
 int main(int argc, char *argv[])
 {
-	int width = 32;
-	int height = 32;
+	int width = 64;
+	int height = 64;
 
 	canvas_create(width, height);
 
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				Uint8 r = 255 - ((255 / height) * y);
-				Uint8 g = (255 / width) * x;
+				Uint8 r = 255 - ((255.0 / height) * y);
+				Uint8 g = (255.0 / width) * x;
 				Uint8 b = frame % 255;
 
 				draw_pixel(x, y, r, g, b);
