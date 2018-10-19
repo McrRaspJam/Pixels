@@ -4,9 +4,9 @@
 #include <unistd.h>
 #include "SDL.h"
 
-#include "canvas/canvas.h"
-#include "canvas/screen.h"
-#include "canvas/draw.h"
+#include "pixels/canvas.h"
+#include "pixels/screen.h"
+#include "pixels/draw.h"
 
 
 int main(int argc, char *argv[])
@@ -19,17 +19,12 @@ int main(int argc, char *argv[])
 	screen_setup(width, height);
 
 	/* ----- Write your program below ----- */
-
-	int x;
 	
-	for (x = 0; x < 8; x++)
-	{
-		Uint8 r = 255;
-		Uint8 g = 128;
-		Uint8 b = 0;
+	Uint8 r = 255;
+	Uint8 g = 255;
+	Uint8 b = 255;
 
-		draw_pixel(x, 4, r, g, b);
-	}
+	draw_pixel(4, 4, r, g, b);
 
 	screen_update();
 	sleep(1);

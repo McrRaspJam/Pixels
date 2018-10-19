@@ -2,21 +2,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include <time.h>
 #include "SDL.h"
 
-#include "canvas/canvas.h"
-#include "canvas/screen.h"
-#include "canvas/draw.h"
+#include "pixels/canvas.h"
+#include "pixels/screen.h"
+#include "pixels/draw.h"
 
 
 int main(int argc, char *argv[])
 {
-	int width = 16;
-	int height = 16;
-
-	int avalanche[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	srand(time(NULL));
+	int width = 32;
+	int height = 32;
 
 	canvas_create(width, height);
 
@@ -25,6 +21,7 @@ int main(int argc, char *argv[])
 	/* ----- Write your program below ----- */
 
 	bool loop = true;
+	int frame = 0;
 
 	while (loop == true)
 	{
@@ -34,28 +31,30 @@ int main(int argc, char *argv[])
 		clear(0, 0, 0);
 
 		int x, y;
+		int pixels_drawn = 0;
 	
-		for (x = 0; x < height; x++)
-		{
-			//Lower the "avalanche" by a random amount in each column
-			int random = (rand() % 2) + 1;
-			avalanche[x] = avalanche[x] + random;
-			
-			for (y = 0; y < height; y++)
+		for (y = 0; y < height; y++)
+			for (x = 0; x < width; x++)
 			{
-				Uint8 r = 255;
-				Uint8 g = 255;
-				Uint8 b = 255;
+				Uint8 r = 255 - ((255 / height) * y);
+				Uint8 g = (255 / width) * x;
+				Uint8 b = (255 / height) * y;
 
-				if (y < avalanche[x])
+				int limit = (frame % (width * height)) + 1;
+
+				if (pixels_drawn < limit)
+				{
 					draw_pixel(x, y, r, g, b);
+					pixels_drawn++;
+				}
 				else
 					break;
 			}
-		}
-
+	
 		screen_update();
-		usleep(41666);
+		usleep(15000);
+
+		frame++;
 	}
 	
 	/* ------------------------------------ */

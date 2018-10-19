@@ -4,9 +4,9 @@
 #include <unistd.h>
 #include "SDL.h"
 
-#include "canvas/canvas.h"
-#include "canvas/screen.h"
-#include "canvas/draw.h"
+#include "pixels/canvas.h"
+#include "pixels/screen.h"
+#include "pixels/draw.h"
 
 
 int main(int argc, char *argv[])

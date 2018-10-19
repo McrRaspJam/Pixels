@@ -5,9 +5,9 @@
 #include <time.h>
 #include "SDL.h"
 
-#include "canvas/canvas.h"
-#include "canvas/screen.h"
-#include "canvas/draw.h"
+#include "pixels/canvas.h"
+#include "pixels/screen.h"
+#include "pixels/draw.h"
 
 
 int main(int argc, char *argv[])
@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
 	int width = 128;
 	int height = 128;
 
-	int avalanche[width];
+	int avalanche[128];
 	int i;
-	for (i = 0; i < width; i++)
+	for (i = 0; i < 128; i++)
 		avalanche[i] = 0;
 
 	srand(time(NULL));
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 		}
 
 		screen_update();
-		usleep(41666);
+		usleep(16777);
 	}
 	
 	/* ------------------------------------ */
