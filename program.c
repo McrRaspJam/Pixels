@@ -4,9 +4,9 @@
 #include <unistd.h>
 #include "SDL.h"
 
-#include "canvas/canvas.h"
-#include "canvas/screen.h"
-#include "canvas/draw.h"
+#include "pixels/canvas.h"
+#include "pixels/screen.h"
+#include "pixels/draw.h"
 
 
 int main(int argc, char *argv[])
@@ -20,41 +20,40 @@ int main(int argc, char *argv[])
 
 	/* ----- Write your program below ----- */
 
-	bool loop = true;
 	int frame = 0;
+	bool ascending = true;
 
-	while (loop == true)
+	bool exit = false;
+
+	while (exit == false)
 	{
-		if (screen_closebuttonpressed() == true)
-			loop = false;
-
-		clear(0, 0, 0);
+		if (screen_closebuttonpressed())
+			break;
 
 		int x, y;
-		int pixels_drawn = 0;
-	
+		
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
 				Uint8 r = 255 - ((255 / height) * y);
 				Uint8 g = (255 / width) * x;
-				Uint8 b = (255 / height) * y;
+				Uint8 b = frame % 255;
 
-				int limit = (frame % (width * height)) + 1;
-
-				if (pixels_drawn < limit)
-				{
-					draw_pixel(x, y, r, g, b);
-					pixels_drawn++;
-				}
-				else
-					break;
+				draw_pixel(x, y, r, g, b);
 			}
-	
-		screen_update();
-		usleep(15000);
+		
+		if (frame >= 254)
+			ascending = false;
+		else if (frame <= 0)
+			ascending = true;
 
-		frame++;
+		if (ascending == true)
+			frame++;
+		else
+			frame--;
+
+		screen_update();
+		usleep(16700);
 	}
 	
 	/* ------------------------------------ */
