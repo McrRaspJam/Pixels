@@ -5,11 +5,9 @@ A C program for drawing pixels on screen at high refresh rates
 
 ## About
 
-McrRaspJam Pixels provides a number of functions that abstract the functionality of the [Simple DirectMedia Layer](https://www.libsdl.org/) library. This allows you to create windows containing pixel graphics.
+McrRaspJam Pixels provides a number of functions that abstract the functionality of the [Simple DirectMedia Layer](https://www.libsdl.org/) library. This allows you to create windows containing pixel graphics
 
-It was designed for use in Raspberry Pi workshops, but should run on any system capable of running SDL.
-
-<video width="128" height="128" autoplay loop>
+<video width="256" height="256" loop>
         <source src="docs/img/testpattern.mp4" type="video/mp4">
 </video>
 
