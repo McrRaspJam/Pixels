@@ -1,9 +1,9 @@
-#include <stdio.h> 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include "SDL.h"
 
+#include "SDL.h"
 #include "pixels/canvas.h"
 #include "pixels/screen.h"
 #include "pixels/draw.h"
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 			break;
 
 		int x, y;
-		
+
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 				draw_pixel(x, y, r, g, b);
 			}
-		
+
 		if (frame >= 254)
 			ascending = false;
 		else if (frame <= 0)
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		screen_update();
 		usleep(16700);
 	}
-	
+
 	/* ------------------------------------ */
 
 	screen_cleanup();
