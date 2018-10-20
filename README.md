@@ -25,7 +25,7 @@ $ sudo apt-get install libsdl2-dev
 On other distributions, ensure you have the GNU C compiler and libraries installed:
 
 ```
-$ sudo apt-get install build-essentials
+$ sudo apt-get install build-essential
 ```
 
 Then, download and extract the [latest file release](https://github.com/McrRaspJam/Pixels/releases/latest) from the GitHub Repo. You can compile the included program with the following command:
