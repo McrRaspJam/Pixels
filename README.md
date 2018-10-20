@@ -1,7 +1,7 @@
 # Pixels
 A C program for drawing pixels on screen at high refresh rates
 
-[Read the documentation](docs/index.md)
+[Read the documentation](https://mcrraspjam.github.io/Pixels/)
 
 ## About
 
