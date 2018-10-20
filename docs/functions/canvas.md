@@ -8,10 +8,10 @@ Creates the canvas.
 Currently the program only supports a single canvas, and changing the canvas without resetting the window may create unexpected results.
 
 ### Parameters
-parameter | usage
---- | ---
-width | The width of the canvas image
-height | The height of the canvas image
+| parameter | usage |
+| --- | --- |
+| width | The width of the canvas image |
+| height | The height of the canvas image |
 
 ### Example
 ```
